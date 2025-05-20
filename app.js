@@ -10,7 +10,7 @@ const authRouter = require('./route/authroute');
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'Server Working Successful',
-    message: 'Welcome To Evento Backend'
+    message: 'Welcome To Hamo Backend'
   });
 });
 
