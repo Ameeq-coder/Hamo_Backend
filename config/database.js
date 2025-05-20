@@ -1,19 +1,29 @@
-require('pg'); // 👈 Force-load pg manually
-
-const { Sequelize } = require("sequelize");
+const { Sequelize } = require('sequelize');
+require('dotenv').config({ path: `${process.cwd()}/.env` });
+const pg = require('pg'); // Explicitly require pg
 
 const env = process.env.NODE_ENV || 'development';
-const config = require('./config')[env];
+const config = require('./config');
 
-const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  {
-    host: config.host,
-    port: config.port,
-    dialect: config.dialect
-  }
-);
+let sequelize;
+
+if (process.env.DATABASE_URL) {
+  // For Vercel or Neon
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    dialectModule: pg, // Add this line to explicitly use pg
+    dialectOptions: {
+      ssl: {
+        require: true, 
+        rejectUnauthorized: false,
+      },
+    },
+  });
+} else {
+  // Local connection
+  sequelize = new Sequelize(config[env], {
+    dialectModule: pg // Add this line here too
+  });
+}
 
 module.exports = sequelize;
