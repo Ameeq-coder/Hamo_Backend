@@ -7,6 +7,11 @@ require('dotenv').config({path: `${process.cwd()}/.env`});
 
 
 const signup = async (req, res) => {
+
+  const { nanoid } = await import('nanoid');
+
+    const customId = 'usr_' + nanoid(10); // like usr_H1n93kAaJp
+
   try {
     const { email, password } = req.body;
 
@@ -21,6 +26,7 @@ const signup = async (req, res) => {
 
     // Create the new user
     const newUser = await Users.create({
+      id: customId, // include this!
       email,
       password: hashedPassword,
       userType: 'user', // optional, since it defaults

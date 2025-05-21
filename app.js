@@ -16,6 +16,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 
+
+
 const PORT=process.env.APP_PORT||5001
 
 // ✅ First connect to the database, then start server

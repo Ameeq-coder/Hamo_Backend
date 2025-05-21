@@ -10,11 +10,10 @@ const sequelize=require('../../config/database')
 
 module.exports = sequelize.define('Users',{
       id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
-      },
+  allowNull: false,
+  primaryKey: true,
+  type: DataTypes.STRING
+},
       userType: {
         type: DataTypes.STRING,
         defaultValue: 'user'
