@@ -49,6 +49,17 @@ const signup = async (req, res) => {
   } catch (error) {
     console.error('Signup Error:', error);
     res.status(500).json({ message: 'Server error during signup.' });
+
+
+      if (error.name === 'SequelizeConnectionRefusedError' || 
+        error.name === 'SequelizeConnectionError') {
+      console.error('❌ Database connection failed during signup');
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection error',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
+    }
   }
 };
 
