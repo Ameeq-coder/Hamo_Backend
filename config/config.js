@@ -2,23 +2,23 @@ require('dotenv').config({ path: `${process.cwd()}/.env` });
 
 module.exports = {
   development: {
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || '12345678',
-    database: process.env.DB_NAME || 'HAMO_DB',
-    port: process.env.DB_PORT || 5432,
-    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    host: process.env.DB_HOST,
     dialect: 'postgres',
   },
   test: {
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || '12345678',
-    database: process.env.DB_NAME || 'HAMO_DB',
-    port: process.env.DB_PORT || 5432,
-    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    host: process.env.DB_HOST,
     dialect: 'postgres',
   },
   production: {
-    use_env_variable: 'postgresql://postgres.jztymqihjrgbvbnyzqmd:Ameeq25012003$@aws-0-us-east-2.pooler.supabase.com:5432/postgres',
+    url: process.env.DATABASE_URL, // Use url instead of use_env_variable
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
@@ -26,12 +26,5 @@ module.exports = {
         rejectUnauthorized: false,
       },
     },
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-    logging: false, // Disable logging in production
   },
 };

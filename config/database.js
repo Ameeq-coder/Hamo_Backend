@@ -8,7 +8,7 @@ const config = require('./config');
 let sequelize;
 
 if (process.env.DATABASE_URL) {
-  // For Vercel or Neon
+  console.log(process.env.DATABASE_URL);
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     dialectModule: pg, // Add this line to explicitly use pg
