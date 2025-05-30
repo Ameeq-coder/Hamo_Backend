@@ -1,81 +1,106 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config({ path: `${process.cwd()}/.env` });
 const pg = require('pg');
 
-const env = process.env.NODE_ENV || 'development';
-const config = require('./config');
+// Only load dotenv in development
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-console.log('🔍 Environment Check:');
-console.log('NODE_ENV:', env);
-console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('🔍 Vercel Environment Debug:');
 console.log('VERCEL:', process.env.VERCEL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('All env vars starting with DATABASE_:', 
+  Object.keys(process.env).filter(k => k.includes('DATABASE')));
 
 let sequelize;
 
-// Force production environment on Vercel
-const isProduction = env === 'production' || process.env.VERCEL || process.env.DATABASE_URL;
-
-if (isProduction && process.env.DATABASE_URL) {
-  console.log('🚀 Using Production Database (Supabase)');
-  console.log('Database URL (first 30 chars):', process.env.DATABASE_URL.substring(0, 30) + '...');
+// Get database configuration
+function getDatabaseConfig() {
+  // For Vercel deployment
+  if (process.env.VERCEL) {
+    const dbUrl = process.env.DATABASE_URL;
+    
+    if (!dbUrl) {
+      console.error('❌ DATABASE_URL not found in Vercel environment');
+      console.log('Available env vars:', Object.keys(process.env).sort());
+      throw new Error('DATABASE_URL environment variable is required for Vercel deployment');
+    }
+    
+    console.log('✅ Found DATABASE_URL in Vercel environment');
+    return {
+      url: dbUrl,
+      config: {
+        dialect: 'postgres',
+        dialectModule: pg,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        },
+        pool: {
+          max: 5,
+          min: 0,
+          acquire: 30000,
+          idle: 10000,
+        },
+        logging: false,
+      }
+    };
+  }
   
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    dialectModule: pg,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-    logging: false, // Set to console.log for debugging
-  });
-} else {
-  console.log('🏠 Using Local Database');
-  sequelize = new Sequelize(config[env], {
-    dialectModule: pg,
-    logging: console.log,
-  });
+  // For local development
+  const config = require('./config');
+  const env = process.env.NODE_ENV || 'development';
+  
+  return {
+    config: {
+      ...config[env],
+      dialectModule: pg,
+      logging: console.log,
+    }
+  };
 }
 
-// Test connection function
+// Initialize Sequelize
+try {
+  const dbConfig = getDatabaseConfig();
+  
+  if (dbConfig.url) {
+    console.log('🚀 Connecting with DATABASE_URL');
+    sequelize = new Sequelize(dbConfig.url, dbConfig.config);
+  } else {
+    console.log('🏠 Connecting with config object');
+    sequelize = new Sequelize(dbConfig.config);
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize Sequelize:', error.message);
+  throw error;
+}
+
+// Test connection
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established successfully');
-    
-    // Log connection details (without sensitive info)
-    console.log('📊 Connection info:', {
-      dialect: sequelize.getDialect(),
-      host: sequelize.config.host || 'from URL',
-      port: sequelize.config.port || 'from URL',
-      database: sequelize.config.database || 'from URL'
-    });
-    
+    console.log('✅ Database connection successful');
     return true;
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    console.error('Error type:', error.constructor.name);
     
-    if (error.parent) {
-      console.error('Connection details:', {
-        address: error.parent.address,
-        port: error.parent.port,
-        code: error.parent.code
+    // More detailed error logging for debugging
+    if (process.env.VERCEL) {
+      console.error('Vercel deployment error details:', {
+        errorName: error.name,
+        errorMessage: error.message,
+        hasParent: !!error.parent,
+        parentMessage: error.parent?.message,
       });
     }
     
-    return false;
+    throw error;
   }
 };
 
-// Test connection on startup
 testConnection();
 
 module.exports = sequelize;
