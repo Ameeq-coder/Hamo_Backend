@@ -40,8 +40,19 @@ const getUserDetails = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Add validation for userId parameter
+    if (!userId || userId.trim() === '') {
+      return res.status(400).json({ 
+        message: 'User ID is required.',
+        error: 'Missing or empty userId parameter'
+      });
+    }
+
+    // Trim and convert to string for consistency (matching your create function)
+    const cleanUserId = String(userId).trim();
+
     const userDetails = await UserDetails.findOne({
-      where: { userId },
+      where: { userId: cleanUserId },
       include: [
         {
           model: Users,
@@ -58,6 +69,7 @@ const getUserDetails = async (req, res) => {
     res.status(200).json(userDetails);
   } catch (error) {
     console.error('Error fetching user details:', error);
+    console.error('Request params:', req.params); // Debug log
     res.status(500).json({ message: 'Server error.' });
   }
 };
