@@ -18,7 +18,7 @@ module.exports = {
     dialect: 'postgres',
   },
   production: {
-    use_env_variable: process.env.DATABASE_URL,
+    use_env_variable: 'postgresql://postgres.jztymqihjrgbvbnyzqmd:Ameeq25012003$@aws-0-us-east-2.pooler.supabase.com:5432/postgres',
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
