@@ -6,6 +6,7 @@ const sequelize = require('./config/database'); // ✅ import database connectio
 app.use(express.json());
 
 const authRouter = require('./route/authroute');
+const serviceauthrouter= require('./route/servicemanroute')
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -15,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
-
+app.use('/api/v1/serviceauth',serviceauthrouter)
 
 
 const PORT=process.env.APP_PORT||5001
