@@ -27,9 +27,13 @@ fs
     );
   })
   .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    // Since your models use sequelize.define() directly, just require them
+    const model = require(path.join(__dirname, file));
     db[model.name] = model;
   });
+
+// Debug: Log what models were loaded
+console.log('Loaded models:', Object.keys(db));
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

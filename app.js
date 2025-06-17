@@ -7,6 +7,7 @@ app.use(express.json());
 
 const authRouter = require('./route/authroute');
 const serviceauthrouter= require('./route/servicemanroute')
+const userdetailrouter=require('./route/userdetailroute')
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -17,7 +18,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/serviceauth',serviceauthrouter)
-
+app.use('/api/v1/userdetail',userdetailrouter)
 
 const PORT=process.env.APP_PORT||5001
 
