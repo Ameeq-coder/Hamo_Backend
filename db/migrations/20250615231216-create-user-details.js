@@ -27,6 +27,10 @@ module.exports = {
       address: {
         type: Sequelize.TEXT
       },
+      imageUrl: {
+  type: Sequelize.STRING,
+  allowNull: true
+},
       createdAt: {
         type: Sequelize.DATE
       },

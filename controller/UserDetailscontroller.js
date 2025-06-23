@@ -7,30 +7,32 @@ const { User, UserDetail } = db;
 
 const createOrUpdateUserDetails = async (req, res) => {
   const { nanoid } = await import('nanoid');
-  
+
   try {
     const { userId, name, dob, phone, address } = req.body;
-    
+    const imageUrl = req.file?.path; // ✅ Get Cloudinary image URL
+
     if (!userId || !name) {
       return res.status(400).json({ message: 'userId and name are required.' });
     }
-    
+
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
-    
+
     let userDetails = await UserDetail.findOne({ where: { userId } });
-    
+
     if (userDetails) {
       userDetails = await userDetails.update({
         name,
         dob,
         phone,
         address,
+        imageUrl: imageUrl || userDetails.imageUrl, // ✅ only update if a new image was uploaded
         updatedAt: new Date()
       });
-      
+
       return res.status(200).json({
         message: 'User details updated successfully.',
         userDetails: {
@@ -39,12 +41,13 @@ const createOrUpdateUserDetails = async (req, res) => {
           name: userDetails.name,
           dob: userDetails.dob,
           phone: userDetails.phone,
-          address: userDetails.address
+          address: userDetails.address,
+          imageUrl: userDetails.imageUrl // ✅ return image
         }
       });
     } else {
       const customId = 'dtl_' + nanoid(10);
-      
+
       userDetails = await UserDetail.create({
         id: customId,
         userId,
@@ -52,10 +55,11 @@ const createOrUpdateUserDetails = async (req, res) => {
         dob,
         phone,
         address,
+        imageUrl, // ✅ add image
         createdAt: new Date(),
         updatedAt: new Date()
       });
-      
+
       return res.status(201).json({
         message: 'User details created successfully.',
         userDetails: {
@@ -64,7 +68,8 @@ const createOrUpdateUserDetails = async (req, res) => {
           name: userDetails.name,
           dob: userDetails.dob,
           phone: userDetails.phone,
-          address: userDetails.address
+          address: userDetails.address,
+          imageUrl: userDetails.imageUrl // ✅ return image
         }
       });
     }
@@ -73,6 +78,7 @@ const createOrUpdateUserDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error while processing user details.' });
   }
 };
+
 
 const getUserDetails = async (req, res) => {
   try {
@@ -107,6 +113,7 @@ const getUserDetails = async (req, res) => {
         dob: userDetails.dob,
         phone: userDetails.phone,
         address: userDetails.address,
+        imageUrl:userDetails.imageUrl,
         user: userDetails.user
       }
     });

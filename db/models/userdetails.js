@@ -35,6 +35,10 @@ const UserDetail = sequelize.define('UserDetail', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+  imageUrl: {
+  type: DataTypes.STRING,
+  allowNull: true
+},
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE
