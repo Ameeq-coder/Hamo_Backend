@@ -57,6 +57,11 @@ module.exports = sequelize.define('Bookings', {
   type: DataTypes.STRING,
   allowNull: false,
 },
+bookingDateTime: {
+  type: DataTypes.DATE,
+  allowNull: false
+},
+
 
   createdAt: {
     allowNull: false,

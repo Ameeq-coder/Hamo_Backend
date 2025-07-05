@@ -8,7 +8,9 @@ const {
   getBookingsByServicemanId,
   completeBooking,
   cancelBooking,
-  getBookingsByStatus
+  getBookingsByStatus,
+  getAvailableTimeSlots,
+  getUserUpcomingBookingsByBookingDate
 } = require('../controller/bookingController');
 
 // POST - Create new booking
@@ -35,5 +37,8 @@ router.put('/specificbooking/:id/cancel', cancelBooking);
 // Get bookings by status
 router.get('/allbookings/status/:status', getBookingsByStatus);
 
+router.get('/available-slots/:servicemanId/:date', getAvailableTimeSlots);
+
+router.get('/created/:userId/:date', getUserUpcomingBookingsByBookingDate);
 
 module.exports = router;

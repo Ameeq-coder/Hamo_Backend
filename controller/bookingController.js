@@ -1,6 +1,9 @@
+const dayjs = require('dayjs');
 const ServiceMan = require('../db/models/serviceman');
 const Booking = require('../db/models/booking');
 const User= require("../db/models/user");
+const { Op } = require('sequelize'); // ✅ Correct way
+
 
 const createBooking = async (req, res) => {
   const { nanoid } = await import('nanoid');
@@ -16,7 +19,8 @@ const createBooking = async (req, res) => {
       serviceOptions,
       location,
       paid,
-      status
+      status,
+      bookingDateTime // should be ISO string like "2025-07-05T09:00:00"
     } = req.body;
 
     // Validate serviceman and user exist
@@ -30,6 +34,12 @@ const createBooking = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
+  const bookingDate = new Date(bookingDateTime);
+    if (isNaN(bookingDate)) {
+      return res.status(400).json({ message: 'Invalid bookingDateTime format.' });
+    }
+
+
     const newBooking = await Booking.create({
       id: customId,
       servicemanId,
@@ -41,6 +51,8 @@ const createBooking = async (req, res) => {
       location,
       paid: paid ?? false,
      status,
+      bookingDateTime: bookingDate,
+
       createdAt: new Date(),
       updatedAt: new Date()
     });
@@ -177,6 +189,79 @@ const getBookingsByStatus = async (req, res) => {
   }
 };
 
+const getAvailableTimeSlots = async (req, res) => {
+  const { servicemanId, date } = req.params;
+
+  try {
+    const allSlots = [
+      '9 AM', '10 AM', '11 AM', '12 PM',
+      '1 PM', '2 PM', '3 PM', '4 PM', '5 PM',
+      '6 PM','7 PM' ,'8 PM','9 PM','10 PM','11 PM','12 AM',
+      '1 AM','2 AM'
+    ];
+
+    // Fetch all upcoming bookings of serviceman
+    const bookings = await Booking.findAll({
+      where: {
+        servicemanId,
+        status: 'upcoming'
+      }
+    });
+
+    // Filter and extract booked slots for the specific date
+    const bookedSlots = bookings
+      .filter(b => dayjs(b.bookingDateTime).format('YYYY-MM-DD') === date)
+      .map(b => dayjs(b.bookingDateTime).format('h A')); // slot time only
+
+    const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
+
+    res.status(200).json({
+      date,
+      availableSlots
+    });
+
+  } catch (error) {
+    console.error('Slot check error:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+
+const getUserUpcomingBookingsByBookingDate = async (req, res) => {
+  try {
+    const { userId, date } = req.params;
+
+    if (!dayjs(date, 'YYYY-MM-DD', true).isValid()) {
+      return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD.' });
+    }
+
+    const startOfDay = dayjs(date).startOf('day').toDate();
+    const endOfDay = dayjs(date).endOf('day').toDate();
+
+    const bookings = await Booking.findAll({
+      where: {
+        userId,
+        status: 'upcoming',
+        bookingDateTime: {
+          [Op.gte]: startOfDay,
+          [Op.lte]: endOfDay
+        }
+      }
+    });
+
+    if (bookings.length === 0) {
+      return res.status(404).json({ message: 'No upcoming bookings for this user on this date.' });
+    }
+
+    res.status(200).json({ bookings });
+
+  } catch (error) {
+    console.error('Error fetching user bookings by bookingDateTime:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+
 
 
 module.exports = {
@@ -187,5 +272,7 @@ module.exports = {
   getBookingsByServicemanId,
   cancelBooking,
   completeBooking,
-  getBookingsByStatus
+  getBookingsByStatus,
+  getAvailableTimeSlots,
+  getUserUpcomingBookingsByBookingDate
 };
