@@ -140,12 +140,19 @@ const updateServiceDetail = async (req, res) => {
   }
 };
 
-const getServicemenByCategory = async (req, res) => {
+const getServicemenByCategoryAndLocation = async (req, res) => {
   try {
-    const { category } = req.params;
+    const { category, location } = req.query;
+
+    if (!category || !location) {
+      return res.status(400).json({ message: 'Category and location are required.' });
+    }
 
     const servicemen = await ServiceDetail.findAll({
-      where: { category },
+      where: {
+        category,
+        location
+      },
       include: [
         {
           model: ServiceMan,
@@ -156,7 +163,7 @@ const getServicemenByCategory = async (req, res) => {
     });
 
     if (servicemen.length === 0) {
-      return res.status(404).json({ message: 'No servicemen found in this category.' });
+      return res.status(404).json({ message: 'No servicemen found for this category and location.' });
     }
 
     res.status(200).json({
@@ -164,16 +171,49 @@ const getServicemenByCategory = async (req, res) => {
       servicemen
     });
   } catch (error) {
-    console.error('Error in getServicemenByCategory:', error);
+    console.error('Error in getServicemenByCategoryAndLocation:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
+const getServicemenByLocation = async (req, res) => {
+  try {
+    const { location } = req.query;
+
+    if (!location) {
+      return res.status(400).json({ message: 'Location is required.' });
+    }
+
+    const servicemen = await ServiceDetail.findAll({
+      where: { location },
+      include: [
+        {
+          model: ServiceMan,
+          as: 'serviceman',
+          attributes: ['id', 'email', 'serviceType']
+        }
+      ]
+    });
+
+    if (servicemen.length === 0) {
+      return res.status(404).json({ message: 'No servicemen found for this location.' });
+    }
+
+    res.status(200).json({
+      message: 'Servicemen fetched successfully.',
+      servicemen
+    });
+  } catch (error) {
+    console.error('Error in getServicemenByLocation:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 
 module.exports = {
   createServiceDetail,
   getServiceDetailByServiceManId,
   updateServiceDetail,
-  getServicemenByCategory
+  getServicemenByCategoryAndLocation,
+  getServicemenByLocation
 };
