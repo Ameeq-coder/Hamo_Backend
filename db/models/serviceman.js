@@ -1,13 +1,8 @@
 'use strict';
-const {
-  Model,
-  Sequelize,
-  DataTypes
-} = require('sequelize');
-
+const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
 
-module.exports = sequelize.define('ServiceMan', {
+const ServiceMan = sequelize.define('ServiceMan', {
   id: {
     allowNull: false,
     primaryKey: true,
@@ -37,5 +32,16 @@ module.exports = sequelize.define('ServiceMan', {
 }, {
   paranoid: true,
   freezeTableName: true,
-  modelName: 'serviceman'
+  tableName: 'ServiceMan',
+  modelName: 'ServiceMan'
 });
+
+// Define association
+ServiceMan.associate = (models) => {
+  ServiceMan.hasOne(models.ServiceDetail, {
+    foreignKey: 'servicemanId',
+    as: 'detail'
+  });
+};
+
+module.exports = ServiceMan;

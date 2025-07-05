@@ -140,10 +140,40 @@ const updateServiceDetail = async (req, res) => {
   }
 };
 
+const getServicemenByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    const servicemen = await ServiceDetail.findAll({
+      where: { category },
+      include: [
+        {
+          model: ServiceMan,
+          as: 'serviceman',
+          attributes: ['id', 'email', 'serviceType']
+        }
+      ]
+    });
+
+    if (servicemen.length === 0) {
+      return res.status(404).json({ message: 'No servicemen found in this category.' });
+    }
+
+    res.status(200).json({
+      message: 'Servicemen fetched successfully.',
+      servicemen
+    });
+  } catch (error) {
+    console.error('Error in getServicemenByCategory:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 
 
 module.exports = {
   createServiceDetail,
   getServiceDetailByServiceManId,
-  updateServiceDetail
+  updateServiceDetail,
+  getServicemenByCategory
 };
