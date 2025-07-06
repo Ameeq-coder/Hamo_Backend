@@ -1,7 +1,13 @@
 const ServiceDetail = require('../db/models/servicedetail');
 const ServiceMan = require('../db/models/serviceman');
 const cloudinary = require('../utils/cloudinary');
+const { Op } = require('sequelize');
 
+const extractCityCountry = (fullAddress) => {
+  const words = fullAddress.trim().split(/\s+/); // split by any space
+  const lastWords = words.slice(-2); // last two words: e.g., ["Lahore", "Pakistan"]
+  return lastWords.join(' ');
+};
 
 const createServiceDetail = async (req, res) => {
 
@@ -148,10 +154,14 @@ const getServicemenByCategoryAndLocation = async (req, res) => {
       return res.status(400).json({ message: 'Category and location are required.' });
     }
 
+    const extractedLocation = extractCityCountry(location); // e.g., Lahore Pakistan
+
     const servicemen = await ServiceDetail.findAll({
       where: {
         category,
-        location
+        location: {
+          [Op.like]: `%${extractedLocation}%`
+        }
       },
       include: [
         {
@@ -176,6 +186,7 @@ const getServicemenByCategoryAndLocation = async (req, res) => {
   }
 };
 
+
 const getServicemenByLocation = async (req, res) => {
   try {
     const { location } = req.query;
@@ -184,8 +195,14 @@ const getServicemenByLocation = async (req, res) => {
       return res.status(400).json({ message: 'Location is required.' });
     }
 
+    const extractedLocation = extractCityCountry(location); // e.g., Lahore Pakistan
+
     const servicemen = await ServiceDetail.findAll({
-      where: { location },
+      where: {
+        location: {
+          [Op.like]: `%${extractedLocation}%`
+        }
+      },
       include: [
         {
           model: ServiceMan,
@@ -208,6 +225,7 @@ const getServicemenByLocation = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 
 module.exports = {
