@@ -300,10 +300,24 @@ const getUserUpcomingBookingsByBookingDate = async (req, res) => {
           [Op.gte]: startOfDay,
           [Op.lte]: endOfDay
         }
-      }
+      },
+      include: [
+        {
+          model: ServiceMan,
+          as: 'serviceman',
+          attributes: ['id', 'email', 'serviceType'],
+          include: [
+            {
+              model: ServiceDetail,
+              as: 'detail',
+              attributes: ['imageUrl', 'category', 'location']
+            }
+          ]
+        }
+      ]
     });
 
-    if (bookings.length === 0) {
+    if (!bookings.length) {
       return res.status(404).json({ message: 'No upcoming bookings for this user on this date.' });
     }
 
