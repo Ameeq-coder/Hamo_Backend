@@ -10,8 +10,12 @@ const {
   cancelBooking,
   getBookingsByStatus,
   getAvailableTimeSlots,
-  getUserUpcomingBookingsByBookingDate
+  getUserUpcomingBookingsByBookingDate,
+  getServicemanUpcomingBookingsByBookingDate
 } = require('../controller/bookingController');
+
+
+
 
 // POST - Create new booking
 router.post('/createbooking', createBooking);
@@ -40,5 +44,7 @@ router.get('/allbookings/status/:status', getBookingsByStatus);
 router.get('/available-slots/:servicemanId/:date', getAvailableTimeSlots);
 
 router.get('/created/:userId/:date', getUserUpcomingBookingsByBookingDate);
+
+router.get('/servicecreated/:servicemanId/:date',getServicemanUpcomingBookingsByBookingDate)
 
 module.exports = router;

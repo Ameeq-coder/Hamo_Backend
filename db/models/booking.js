@@ -6,7 +6,7 @@ const {
 
 const sequelize = require('../../config/database');
 
-module.exports = sequelize.define('Bookings', {
+const Bookings = sequelize.define('Bookings', {
  id: {
   allowNull: false,
   primaryKey: true,
@@ -61,6 +61,18 @@ bookingDateTime: {
   type: DataTypes.DATE,
   allowNull: false
 },
+startTime: {
+  type: DataTypes.TIME,
+  allowNull: false
+},
+endTime: {
+  type: DataTypes.TIME,
+  allowNull: false
+},
+price: {
+  type: DataTypes.FLOAT,
+  allowNull: false
+},
 
 
   createdAt: {
@@ -81,3 +93,19 @@ bookingDateTime: {
   freezeTableName: true,
   modelName: 'bookings',
 });
+
+
+Bookings.associate = (models) => {
+  Bookings.belongsTo(models.ServiceMan, {
+    foreignKey: 'servicemanId',
+    as: 'serviceman'
+  });
+ 
+  Bookings.belongsTo(models.User, {
+  foreignKey: 'userId',
+  as: 'user'
+})
+
+};
+
+module.exports=Bookings

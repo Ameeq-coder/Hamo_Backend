@@ -42,6 +42,19 @@ ServiceMan.associate = (models) => {
     foreignKey: 'servicemanId',
     as: 'detail'
   });
+
+
+    ServiceMan.hasMany(models.Bookings, {
+    foreignKey: 'servicemanId',
+    as: 'bookings'
+  });
+
+ServiceMan.hasMany(models.Invite, {
+  foreignKey: 'servicemanId',
+  as: 'invites'
+});
+
+
 };
 
 module.exports = ServiceMan;

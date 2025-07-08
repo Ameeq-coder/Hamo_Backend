@@ -43,6 +43,13 @@ User.associate = (models) => {
     foreignKey: 'userId',
     as: 'details'
   });
+
+User.hasMany(models.Invite, {
+  foreignKey: 'userId',
+  as: 'invites'
+});
+
+
 };
 
 module.exports = User;

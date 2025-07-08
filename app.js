@@ -10,6 +10,7 @@ const serviceauthrouter= require('./route/servicemanroute')
 const userdetailrouter=require('./route/userdetailroute')
 const serviceDetailRoute = require('./route/servicedetailroute');
 const bookingRoutes = require('./route/bookingRoutes');
+const inviteRoutes = require('./route/inviterouter');
 
 
 
@@ -26,6 +27,7 @@ app.use('/api/v1/serviceauth',serviceauthrouter)
 app.use('/api/v1/userdetail',userdetailrouter)
 app.use('/api/v1/servicedetail', serviceDetailRoute);
 app.use('/api/v1/booking',bookingRoutes);
+app.use('/api/v1/invites',inviteRoutes)
 
 const PORT=process.env.APP_PORT||5001
 

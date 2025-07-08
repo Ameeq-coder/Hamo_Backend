@@ -1,6 +1,6 @@
 const db = require("../db/models/index");
 const { User, UserDetail } = db;
-
+const { Op } = require('sequelize');
 // Alternative: Import models directly
 // const User = require("../db/models/user");
 // const UserDetail = require("../db/models/userdetails");
@@ -124,7 +124,51 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+
+const getUsersByLocation = async (req, res) => {
+  try {
+    const { location } = req.query;
+
+    if (!location) {
+      return res.status(400).json({ message: 'Location is required.' });
+    }
+
+    // 🔥 Just use raw location directly for filtering
+    const users = await UserDetail.findAll({
+      where: {
+        address: {
+          [Op.like]: `%${location}%`
+        }
+      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'email', 'userType']
+        }
+      ]
+    });
+
+    if (!users.length) {
+      return res.status(404).json({ message: 'No users found for this location.' });
+    }
+
+    res.status(200).json({
+      message: 'Users fetched successfully.',
+      users
+    });
+
+  } catch (error) {
+    console.error('Error in getUsersByLocation:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+
+
 module.exports = {
   createOrUpdateUserDetails,
   getUserDetails,
+  getUsersByLocation
 };

@@ -40,6 +40,19 @@ module.exports = {
   type: Sequelize.DATE,
   allowNull: false
 },
+// Inside await queryInterface.createTable('Bookings', { ... })
+startTime: {
+  type: Sequelize.TIME,
+  allowNull: false
+},
+endTime: {
+  type: Sequelize.TIME,
+  allowNull: false
+},
+price: {
+  type: Sequelize.FLOAT,
+  allowNull: false
+},
 
 
       createdAt: {
