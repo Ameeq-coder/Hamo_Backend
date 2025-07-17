@@ -253,12 +253,17 @@ const getAvailableTimeSlots = async (req, res) => {
       const bookingDate = dayjs(booking.bookingDateTime).format('YYYY-MM-DD');
 
       if (bookingDate === date) {
-        const start = dayjs(`${date} ${booking.startTime}`, 'YYYY-MM-DD HH:mm:ss');
-        const end = dayjs(`${date} ${booking.endTime}`, 'YYYY-MM-DD HH:mm:ss');
+        const start = dayjs(`${date} ${booking.startTime}`, 'YYYY-MM-DD h A');
+        const end = dayjs(`${date} ${booking.endTime}`, 'YYYY-MM-DD h A');
+
+        if (!start.isValid() || !end.isValid()) {
+          console.warn(`Invalid time format for booking ID ${booking.id}`);
+          return;
+        }
 
         for (
-          let time = start;
-          time.isBefore(end) || time.isSame(end, 'hour');
+          let time = start.clone();
+          time.isBefore(end);
           time = time.add(1, 'hour')
         ) {
           const slotLabel = time.format('h A'); // Example: "9 PM"
