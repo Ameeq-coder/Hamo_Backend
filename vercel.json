@@ -1,11 +1,25 @@
 {
     "version": 2,
     "builds": [
-      {
-        "src": "app.js",
-        "use": "@vercel/node"
+    {
+      "src": "app.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "Hamo_Backend/**"
+        ]
       }
-    ],
+    },
+    {
+      "src": "websocket.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "Hamo_Backend/**"
+        ]
+      }
+    }
+  ],
     "routes": [
       {
         "src": "/(.*)",
