@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
-const Message = require("../Hamo_Backend/db/models/message")
-const ChatList= require("../Hamo_Backend/db/models/chatlist")
+const path = require('path');
+const Message = require("./db/models/message");  // Removed Hamo_Backend from path
+const ChatList = require("./db/models/chatlist"); 
 const { v4: uuidv4 } = require('uuid');
 
 const initWebSocket = (server) => {
