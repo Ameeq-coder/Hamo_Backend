@@ -2,6 +2,10 @@ require('dotenv').config({ path: `${process.cwd()}/.env` });
 const express = require('express');
 const app = express();
 const sequelize = require('./config/database'); // ✅ import database connection
+const http = require('http'); 
+const initWebSocket = require('./websocket'); // Adjust path if your file is elsewhere
+
+
 
 app.use(express.json());
 
@@ -11,8 +15,7 @@ const userdetailrouter=require('./route/userdetailroute')
 const serviceDetailRoute = require('./route/servicedetailroute');
 const bookingRoutes = require('./route/bookingRoutes');
 const inviteRoutes = require('./route/inviterouter');
-
-
+const chatRoutes=require('./route/chatRoutes')
 
 
 app.get('/', (req, res) => {
@@ -28,14 +31,19 @@ app.use('/api/v1/userdetail',userdetailrouter)
 app.use('/api/v1/servicedetail', serviceDetailRoute);
 app.use('/api/v1/booking',bookingRoutes);
 app.use('/api/v1/invites',inviteRoutes)
+app.use('/api/v1/chat', chatRoutes);
 
 const PORT=process.env.APP_PORT||5001
 
-// ✅ First connect to the database, then start server
 sequelize.authenticate()
   .then(() => {
     console.log('✅ Database connected successfully!');
-    app.listen(PORT, () => {
+
+    // Combine Express and WebSocket
+    const server = http.createServer(app);     // Create HTTP server using Express app
+    initWebSocket(server);                     // Pass it to WebSocket initializer
+
+    server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   })
