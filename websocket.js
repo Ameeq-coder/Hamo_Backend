@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
-const Message = require("../Hamo Backend/db/models/message")
-const ChatList= require("../Hamo Backend/db/models/chatlist")
+const Message = require("../Hamo_Backend/db/models/message")
+const ChatList= require("../Hamo_Backend/db/models/chatlist")
 const { v4: uuidv4 } = require('uuid');
 
 const initWebSocket = (server) => {
