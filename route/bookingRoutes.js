@@ -53,13 +53,13 @@ router.get('/servicecreated/:servicemanId/:date',getServicemanUpcomingBookingsBy
 
 // GET - Count upcoming bookings
 
-router.get('/count/upcoming/:servicemanId', getUpcomingBookingsCount);
+// router.get('/count/upcoming/:servicemanId', getUpcomingBookingsCount);
 
-// GET - Count completed bookings
-router.get('/count/completed/:servicemanId', getCompletedBookingsCount);
+// // GET - Count completed bookings
+// router.get('/count/completed/:servicemanId', getCompletedBookingsCount);
 
-// GET - Count cancelled bookings
-router.get('/count/cancelled/:servicemanId', getCancelledBookingsCount);
+// // GET - Count cancelled bookings
+// router.get('/count/cancelled/:servicemanId', getCancelledBookingsCount);
 
 // GET - All booking counts (BONUS: Get all counts in one call)
 router.get('/count/all/:servicemanId', getAllBookingsCounts);
