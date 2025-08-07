@@ -382,6 +382,112 @@ const getServicemanUpcomingBookingsByBookingDate = async (req, res) => {
   }
 };
 
+const getUpcomingBookingsCount = async (req, res) => {
+  try {
+    const { servicemanId } = req.params;
+    
+    const whereCondition = servicemanId 
+      ? { status: 'upcoming', servicemanId }
+      : { status: 'upcoming' };
+
+    const count = await Booking.count({
+      where: whereCondition
+    });
+
+    res.status(200).json({
+      status: 'upcoming',
+      servicemanId: servicemanId || 'all',
+      count
+    });
+  } catch (error) {
+    console.error('Error counting upcoming bookings:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+// Count completed bookings (Global or by ServicemanId)
+const getCompletedBookingsCount = async (req, res) => {
+  try {
+    const { servicemanId } = req.params;
+    
+    const whereCondition = servicemanId 
+      ? { status: 'completed', servicemanId }
+      : { status: 'completed' };
+
+    const count = await Booking.count({
+      where: whereCondition
+    });
+
+    res.status(200).json({
+      status: 'completed',
+      servicemanId: servicemanId || 'all',
+      count
+    });
+  } catch (error) {
+    console.error('Error counting completed bookings:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+const getCancelledBookingsCount = async (req, res) => {
+  try {
+    const { servicemanId } = req.params;
+    
+    const whereCondition = servicemanId 
+      ? { status: 'cancelled', servicemanId }
+      : { status: 'cancelled' };
+
+    const count = await Booking.count({
+      where: whereCondition
+    });
+
+    res.status(200).json({
+      status: 'cancelled',
+      servicemanId: servicemanId || 'all',
+      count
+    });
+  } catch (error) {
+    console.error('Error counting cancelled bookings:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+// Get all counts in one API call (Global or by ServicemanId)
+const getAllBookingsCounts = async (req, res) => {
+  try {
+    const { servicemanId } = req.params;
+    
+    const whereConditions = servicemanId ? {
+      upcoming: { status: 'upcoming', servicemanId },
+      completed: { status: 'completed', servicemanId },
+      cancelled: { status: 'cancelled', servicemanId }
+    } : {
+      upcoming: { status: 'upcoming' },
+      completed: { status: 'completed' },
+      cancelled: { status: 'cancelled' }
+    };
+
+    const [upcomingCount, completedCount, cancelledCount] = await Promise.all([
+      Booking.count({ where: whereConditions.upcoming }),
+      Booking.count({ where: whereConditions.completed }),
+      Booking.count({ where: whereConditions.cancelled })
+    ]);
+
+    res.status(200).json({
+      servicemanId: servicemanId || 'all',
+      counts: {
+        upcoming: upcomingCount,
+        completed: completedCount,
+        cancelled: cancelledCount,
+        total: upcomingCount + completedCount + cancelledCount
+      }
+    });
+  } catch (error) {
+    console.error('Error counting all bookings:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
 
 module.exports = {
   createBooking,
@@ -394,5 +500,9 @@ module.exports = {
   getBookingsByStatus,
   getAvailableTimeSlots,
   getUserUpcomingBookingsByBookingDate,
-  getServicemanUpcomingBookingsByBookingDate
+  getServicemanUpcomingBookingsByBookingDate,
+  getUpcomingBookingsCount,
+  getCompletedBookingsCount,
+  getCancelledBookingsCount,
+  getAllBookingsCounts
 };
