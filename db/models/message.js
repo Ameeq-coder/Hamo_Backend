@@ -21,6 +21,15 @@ const Message = sequelize.define('Message', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  recevierid:{
+      type: DataTypes.STRING,
+    allowNull: false
+  },
+   receviertype: {
+    type: DataTypes.STRING,
+    allowNull: false
+    // values: 'user', 'serviceman'
+  },
   message: {
     type: DataTypes.TEXT,
     allowNull: false

@@ -17,6 +17,12 @@ module.exports = {
       senderId: {
         type: Sequelize.STRING
       },
+      recevierid:{
+        type: Sequelize.STRING
+      },
+      receviertype:{
+         type: Sequelize.STRING
+      },
       message: {
         type: Sequelize.STRING
       },
